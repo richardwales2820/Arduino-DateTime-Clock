@@ -39,17 +39,23 @@
 
 // include the library code:
 #include <LiquidCrystal.h>
+#include <Servo.h>
 #include "MSPClock.h"
 
-MSPClock clock(0, 0, 0, 1, 1, 2016);
+MSPClock clock(0, 0, 7, 1, 1, 2016);
 // initialize the library with the numbers of the interface pins
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+Servo s;
+int pos = 0, elapsedSec = 0;
 
 void setup() {
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
 
   Serial.begin(9600);
+  s.attach(6);
+  s.write(0);
+  delay(2000);
 }
 
 void loop() {
@@ -60,9 +66,18 @@ void loop() {
   }
 
   updateLcd();
-  clock.tickTock();
-  
-  delay(1000);
+  //clock.tickTock();
+  fastTock();
+  updateServo();
+  //s.write(pos++);
+  //delay(10);
+}
+
+void fastTock()
+{
+  int i;
+  for (i = 0; i < 26; i++)
+    clock.tickTock();
 }
 
 void updateClock()
@@ -95,6 +110,25 @@ void updateClock()
   clock.year = Serial.parseInt();
 
   clock.checkLeap();
+}
+
+void updateServo()
+{
+  if ((clock.hour >= 7) && (clock.hour <= 20))
+  {
+    elapsedSec++;
+
+    if (elapsedSec % 10 == 0)
+     {
+      pos += 1;
+      s.write(pos);
+     }
+  }
+  else
+  {
+    pos = 0;
+    s.write(0);
+  }
 }
 
 void updateLcd()

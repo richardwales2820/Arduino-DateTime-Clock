@@ -55,10 +55,12 @@ void MSPClock::tickTock()
 		else
 		{
 			min = 0;
-
+      
 			if (hour < 23)
 				hour++;
 
+      //CHECK DST
+      
 			else
 			{
 				hour = 0;
