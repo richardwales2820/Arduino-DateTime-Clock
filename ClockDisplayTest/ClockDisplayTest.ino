@@ -1,15 +1,5 @@
 /*
-  LiquidCrystal Library - Hello World
-
- Demonstrates the use a 16x2 LCD display.  The LiquidCrystal
- library works with all LCD displays that are compatible with the
- Hitachi HD44780 driver. There are many of them out there, and you
- can usually tell them by the 16-pin interface.
-
- This sketch prints "Hello World!" to the LCD
- and shows the time.
-
-  The circuit:
+ * The LCD circuit:
  * LCD RS pin to digital pin 12
  * LCD Enable pin to digital pin 11
  * LCD D4 pin to digital pin 5
@@ -22,68 +12,85 @@
  * 10K resistor:
  * ends to +5V and ground
  * wiper to LCD VO pin (pin 3)
-
- Library originally added 18 Apr 2008
- by David A. Mellis
- library modified 5 Jul 2009
- by Limor Fried (http://www.ladyada.net)
- example added 9 Jul 2009
- by Tom Igoe
- modified 22 Nov 2010
- by Tom Igoe
-
- This example code is in the public domain.
-
  http://www.arduino.cc/en/Tutorial/LiquidCrystal
  */
 
-// include the library code:
+// include the library code from LCD, Servo, and MSPClock:
 #include <LiquidCrystal.h>
 #include <Servo.h>
 #include "MSPClock.h"
 
+// Declare and initialize a clock object
+// Format: MSPClock VARIABLE_NAME(SEC, MIN, HOUR, DAY, MONTH, YEAR);
 MSPClock clock(0, 0, 7, 1, 1, 2016);
-// initialize the library with the numbers of the interface pins
+
+// initialize the LCD object with the numbers of the interface pins specified in the comments above
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+// initialize new Servo object "s"
 Servo s;
+
+// pos holds the angular position of the servo
+// elapsedSec holds how many seconds have passed since the beginning of sunrise
 int pos = 0, elapsedSec = 0;
 
 void setup() {
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
 
+  // Begin serial communication for work with the computer
   Serial.begin(9600);
+
+  // Attach Pin 6 to the servo object
   s.attach(6);
+
+  // Set the servo to angular position 0
   s.write(0);
+
+  // Wait 2 seconds to fully move the servo to the start position before running any other code
   delay(2000);
 }
 
 void loop() {
 
+  // Checks if the first tag byte "A" has been sent to the Arduino
   if (Serial.read() == 'A')
   {
+      // if it has, go into this function
       updateClock();
   }
 
+  // 
   updateLcd();
-  //clock.tickTock();
+  
+  clock.tickTock();
   fastTock();
   updateServo();
-  //s.write(pos++);
+  
   //delay(10);
 }
 
 void fastTock()
 {
   int i;
+
+  // Incrememnt 26 seconds by calling tickTock() 26 times
+  // For debugging purposes only
   for (i = 0; i < 26; i++)
     clock.tickTock();
 }
 
+// Updates the clock's variables according to values sent over serial
+// From a PyQt application sent with pyserial
 void updateClock()
 {
+  // The "A" tag was already found in the loop() function so we know
+  // we can parse the seconds bytes now
   clock.sec = Serial.parseInt();
-  
+
+
+  // Until the "B" tag has been sent, wait
+  // After the loop breaks and the "B"tag was sent, parse the next bytes as the minutes value
   while (Serial.read() != 'B') 
   { 
   }
