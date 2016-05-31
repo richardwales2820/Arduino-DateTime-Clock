@@ -42,7 +42,7 @@ class App(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
 
         #Connects the button to a function defined below so it runs upon being clicked
-        self.pushButton.clicked.connect(self.checkDate)
+        self.pushButton.clicked.connect(self.sendDate)
 
     def checkDate(self):
         date = self.calendarWidget.selectedDate()
@@ -108,7 +108,7 @@ class App(QtWidgets.QMainWindow, Ui_MainWindow):
         sleep(1)
 
         self.serial.write(str("G").encode(encoding="latin-1"))
-        self.serial.write(yearBytes)
+        self.serial.write(dayOfWeekBytes)
 
 def main():
 

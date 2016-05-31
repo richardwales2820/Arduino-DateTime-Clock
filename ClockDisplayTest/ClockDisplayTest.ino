@@ -79,7 +79,7 @@ void loop() {
   updateServo();
 
   // Wait 1 second to do everything again
-  //delay(1000);
+  delay(1000);
 }
 
 void setupTimesAndInterval()
@@ -142,7 +142,7 @@ void updateClock()
   clock.dayOfWeek = Serial.parseInt();
   
   clock.checkLeap();
-
+  clock.dstDone = 0;
   setupTimesAndInterval();
 }
 

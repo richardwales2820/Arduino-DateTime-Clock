@@ -65,26 +65,30 @@ void MSPClock::tickTock()
 		else
 		{
 			min = 0;
-      
-			if (hour < 23)
-				hour++;
 
-      if (hour == 2 && day >= 7 && dayOfWeek == 7 && month == 3 && dstDone == 0)
+      if (hour == 1 && day >= 7 && dayOfWeek == 7 && month == 3 && dstDone == 0)
       {
         hour++;
         dstDone = 1;
       }
       
-      else if (hour == 2 && dayOfWeek == 7 && month == 11 && dstDone == 0)
+      else if (hour == 1 && dayOfWeek == 7 && month == 11 && dstDone == 0)
       {
         hour--;
         dstDone = 1;
       }
       
+			if (hour < 23)
+				hour++;
+
 			else
 			{
 				hour = 0;
 
+        dayOfWeek++;
+        if (dayOfWeek == 8)
+          dayOfWeek = 1;
+        
 				if (day < daysPerMonth[month])
 					day++;
 
