@@ -59,6 +59,8 @@ void setup() {
 
 void loop() {
 
+  if (clock.hour == 0)
+    setupTimesAndInterval();
   // Checks if the first tag byte "A" has been sent to the Arduino
   if (Serial.read() == 'A')
   {
@@ -95,7 +97,7 @@ void fastTock()
 
   // Incrememnt 26 seconds by calling tickTock() 26 times
   // For debugging purposes only
-  for (i = 0; i < 26; i++)
+  for (i = 0; i < secondsPerDegree; i++)
     clock.tickTock();
 }
 
@@ -154,7 +156,7 @@ void updateServo()
       (clock.hour <= clock.sunsetHour && clock.min <= clock.sunsetMinute))
   {
     // increase how many seconds have passed since sunrise
-    elapsedSec++;
+    //elapsedSec++;
 
     // if the servo needs to move 1 degree every 10 seconds,
     // check if 10 seconds have passed since last time
@@ -191,6 +193,10 @@ void updateLcd()
   // next second it shows: 0:21:09 instead of 0:21:00  WHY? Because it printed the values in clock but doesn't clear the screen each time it write
   // This empty lcd.print("      ") ensures that the top line gets "cleared" to avoid this issue
   lcd.print("      ");
+  //lcd.print("=");
+  //lcd.print((int)clock.sunriseHour);
+  //lcd.print(":");
+  //lcd.print((int)clock.sunriseMinute);
   
   lcd.setCursor(0,1);
 
@@ -200,5 +206,9 @@ void updateLcd()
   lcd.print("-");
   lcd.print(clock.year);
   lcd.print("      ");
+  //lcd.print("=");
+  //lcd.print((int)clock.sunsetHour);
+  //lcd.print(":");
+  //lcd.print((int)clock.sunsetMinute);
 }
 

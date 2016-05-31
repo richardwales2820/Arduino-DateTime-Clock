@@ -84,11 +84,7 @@ void MSPClock::tickTock()
 			else
 			{
 				hour = 0;
-
-        dayOfWeek++;
-        if (dayOfWeek == 8)
-          dayOfWeek = 1;
-        
+       
 				if (day < daysPerMonth[month])
 					day++;
 
@@ -108,6 +104,9 @@ void MSPClock::tickTock()
 						checkLeap();
 					}
 				}
+        dayOfWeek++;
+        if (dayOfWeek == 8)
+          dayOfWeek = 1;
 			}
 		}
   }
@@ -115,11 +114,18 @@ void MSPClock::tickTock()
 
 void MSPClock::riseAndShine()
 {
+  int daysPassed = day, i;
+  
+  for (i = 1; i < month; i++)
+  {
+    day += daysPerMonth[i];
+  }
+  
 	double pi = M_PI;
 	double theta = 2 * pi * (day - 80)/365.25;
 	
 	double radiusEarth = 6378 * pow(10, 3);
-	double latitude = 0.698;
+	double latitude = 0.497;
 	double earthsDistance = 149598000 * pow (10, 3);
 	double epsilon = 0.409;
 	
@@ -129,8 +135,8 @@ void MSPClock::riseAndShine()
 				 (2 * pi)) / 60.0;
 	double t_hat = (t_0 + 5.0/60.0);
 	
-	double n = (720-10 * sin(4 * pi * (day - 80)/365.25) + 8 * sin(2 * pi * 
-				day / 365.25)) / 60.0;
+	double n = (720-10 * sin(4 * pi * (daysPassed - 80)/365.25) + 8 * sin(2 * pi * 
+				daysPassed / 365.25)) / 60.0;
 	double sunrise = (n - t_hat);
 	sunriseHour = floor(sunrise);
 	double sunriseFraction = sunrise - sunriseHour;
