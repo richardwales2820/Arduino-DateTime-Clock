@@ -1,12 +1,12 @@
 #include "MSPClock.h"
-
+#include <cmath>
 
 // Default Constructor
 MSPClock::MSPClock()
 {
 }
 
-// Overloaded constructor to inclue the ability to set the data variables to some values at initialization
+// Overloaded constructor to include the ability to set the data variables to some values at initialization
 MSPClock::MSPClock(int inSec, int inMin, int inHour, int inDay, int inMonth, int inYear)
 {
   // Sets local object's values to the passed in arguments
@@ -96,4 +96,33 @@ void MSPClock::tickTock()
 			}
 		}
   }
+}
+
+void MSPClock::riseAndShine()
+{
+	double pi = M_PI;
+	double theta = 2 * pi * (day - 80)/365.25;
+	
+	double radiusEarth = 6378 * pow(10, 3);
+	double latitude = 0.698;
+	double earthsDistance = 149598000 * pow (10, 3);
+	double epsilon = 0.409;
+	
+	double z_s = earthsDistance * sin(theta) * sin(epsilon);
+	double r_p = sqrt(pow(earthsDistance, 2) - pow(z_s, 2));
+	double t_0 = (1440 * acos((radiusEarth-z_s * sin(latitude))/(r_p * cos(latitude)))/
+				 (2 * pi)) / 60.0;
+	double t_hat = (t_0 + 5.0/60.0);
+	
+	double n = (720-10 * sin(4 * pi * (day - 80)/365.25) + 8 * sin(2 * pi * 
+				day / 365.25)) / 60.0;
+	double sunrise = (n - t_hat);
+	sunriseHour = floor(sunrise);
+	double sunriseFraction = sunrise - sunriseHour;
+	sunriseMinute = sunriseFraction * 60.0;
+	
+	double sunset = (n + t_hat);
+	sunsetHour = floor(sunset);
+	double sunsetFraction = sunset - sunsetHour;
+	sunsetMinute = sunsetFraction * 60.0;
 }
