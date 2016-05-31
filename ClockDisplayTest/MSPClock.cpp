@@ -1,5 +1,5 @@
 #include "MSPClock.h"
-#include <cmath>
+#include <math.h>
 
 // Default Constructor
 MSPClock::MSPClock()
@@ -16,7 +16,8 @@ MSPClock::MSPClock(int inSec, int inMin, int inHour, int inDay, int inMonth, int
 	day = inDay;
 	month = inDay;
 	year = inYear;
-
+  dstDone = 0;
+  
 	int i;
 
   // Initializes the dasPerMonth array to the correct number of days according to the month
@@ -68,9 +69,18 @@ void MSPClock::tickTock()
 			if (hour < 23)
 				hour++;
 
-      //CHECK DST HERE
-      //e.g. if (hour == 2 && day == DST day && month == DST month)
-      //     { hour++ or hour-- }; also set some flag to be sure DST isnt checked indefinitely if the time goes back one hour
+      if (hour == 2 && day >= 7 && dayOfWeek == 7 && month == 3 && dstDone == 0)
+      {
+        hour++;
+        dstDone = 1;
+      }
+      
+      else if (hour == 2 && dayOfWeek == 7 && month == 11 && dstDone == 0)
+      {
+        hour--;
+        dstDone = 1;
+      }
+      
 			else
 			{
 				hour = 0;
@@ -82,9 +92,10 @@ void MSPClock::tickTock()
 				{
 					day = 0;
 
+          dstDone = 0;
 					if (month < 12)
 						month++;
-
+          
 					else
 					{
 						month = 0;
@@ -126,3 +137,12 @@ void MSPClock::riseAndShine()
 	double sunsetFraction = sunset - sunsetHour;
 	sunsetMinute = sunsetFraction * 60.0;
 }
+
+int MSPClock::getSecondsPerDegree()
+{
+  double daylightSeconds = ((sunsetHour - sunriseHour) * 60 + (sunsetMinute - sunriseMinute)) * 60;
+  int secondsPerDegree = floor(daylightSeconds / 180);
+
+  return secondsPerDegree;
+}
+

@@ -42,7 +42,14 @@ class App(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
 
         #Connects the button to a function defined below so it runs upon being clicked
-        self.pushButton.clicked.connect(self.sendDate)
+        self.pushButton.clicked.connect(self.checkDate)
+
+    def checkDate(self):
+        date = self.calendarWidget.selectedDate()
+        time = self.timeEdit.time()
+
+        dayOfWeek = date.dayOfWeek()
+        print(dayOfWeek)
 
     def sendDate(self):
         """
@@ -54,6 +61,9 @@ class App(QtWidgets.QMainWindow, Ui_MainWindow):
         date = self.calendarWidget.selectedDate()
         time = self.timeEdit.time()
 
+        dayOfWeek = date.dayOfWeek()
+        print(dayOfWeek)
+        
         secBytes = bytes(str(time.second()).encode(encoding="latin-1"))  
         minBytes = bytes(str(time.minute()).encode(encoding="latin-1"))
         hourBytes = bytes(str(time.hour()).encode(encoding="latin-1"))
@@ -61,6 +71,8 @@ class App(QtWidgets.QMainWindow, Ui_MainWindow):
         dayBytes = bytes(str(date.day()).encode(encoding="latin-1"))
         monthBytes = bytes(str(date.month()).encode(encoding="latin-1"))
         yearBytes = bytes(str(date.year()).encode(encoding="latin-1"))
+
+        dayOfWeekBytes = bytes(str(dayOfWeek).encode(encoding="latin-1"))  
 
         """
         Before sending each string of bytes, a tag corresponding to a letter is sent.
@@ -93,7 +105,10 @@ class App(QtWidgets.QMainWindow, Ui_MainWindow):
         
         self.serial.write(str("F").encode(encoding="latin-1"))
         self.serial.write(yearBytes)
-       
+        sleep(1)
+
+        self.serial.write(str("G").encode(encoding="latin-1"))
+        self.serial.write(yearBytes)
 
 def main():
 

@@ -5,6 +5,8 @@ class MSPClock
 public:
   // time variables to store datetime 
 	int sec, min, hour, day, month, year;
+  int dayOfWeek;
+  int dstDone;
 	double sunriseHour, sunriseMinute, sunsetHour, sunsetMinute;
   // daysPerMonth holds days in each month, changes depending on leap year  
 	int daysPerMonth[12];
@@ -16,5 +18,6 @@ public:
 	void tickTock();
 	void checkLeap();
 	void riseAndShine();
+  int getSecondsPerDegree();
 };
 

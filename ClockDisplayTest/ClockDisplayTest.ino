@@ -36,6 +36,7 @@ Servo s;
 // pos holds the angular position of the servo
 // elapsedSec holds how many seconds have passed since the beginning of sunrise
 int pos = 0, elapsedSec = 0;
+int secondsPerDegree = 0;
 
 void setup() {
   // set up the LCD's number of columns and rows:
@@ -52,6 +53,8 @@ void setup() {
 
   // Wait 2 seconds to fully move the servo to the start position before running any other code
   delay(2000);
+
+  setupTimesAndInterval();
 }
 
 void loop() {
@@ -77,6 +80,12 @@ void loop() {
 
   // Wait 1 second to do everything again
   //delay(1000);
+}
+
+void setupTimesAndInterval()
+{
+  clock.riseAndShine();
+  secondsPerDegree = clock.getSecondsPerDegree();
 }
 
 // This is a function that tickTocks many times to simulate a full day in a shorter time
@@ -127,14 +136,22 @@ void updateClock()
   }
   clock.year = Serial.parseInt();
 
+  while (Serial.read() != 'G')
+  {
+  }
+  clock.dayOfWeek = Serial.parseInt();
+  
   clock.checkLeap();
+
+  setupTimesAndInterval();
 }
 
 // Checks the time every second to updates the servo position
 void updateServo()
 {
   // TODO: add sunrise and sunset hours
-  if ((clock.hour >= 7) && (clock.hour <= 20))
+  if ((clock.hour >= clock.sunriseHour && clock.min >= clock.sunriseMinute) && 
+      (clock.hour <= clock.sunsetHour && clock.min <= clock.sunsetMinute))
   {
     // increase how many seconds have passed since sunrise
     elapsedSec++;
@@ -142,7 +159,7 @@ void updateServo()
     // if the servo needs to move 1 degree every 10 seconds,
     // check if 10 seconds have passed since last time
     // TODO: change to something like [(sunsetTime - sunriseTime).toSeconds() / 180 degrees]
-    if (elapsedSec % 10 == 0)
+    if (elapsedSec % secondsPerDegree == 0)
     {
       // Update pos variable and write servo to the new pos
       pos += 1;
