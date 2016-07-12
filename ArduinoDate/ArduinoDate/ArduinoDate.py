@@ -25,17 +25,24 @@ class App(QtWidgets.QMainWindow, Ui_MainWindow):
 
         #Create a serial object from pyserial
         self.serial = serial.Serial()
-
+        
         #Iterate the list of available ports and check if its tag matches |   [These tags, "Arduino" and "Generic" are just descriptions that 
         #the arduino's tag listed in Windows COM port (Arduino)           |    are given for the arduino in a windows and mac computer]
         #or Mac OSX /dev/ tree (Generic)                                  |
+        ports = [x for x in list(serial.tools.list_ports.comports())]
+        print([x.description for x in ports])
+        self.serial.port = str(ports[int(input("Select a port (starting at 0):"))].device)
+        self.serial.timeout = 1
+        self.serial.setDTR(False)
+        self.serial.open()
+        """
         for p in list(serial.tools.list_ports.comports()):
-            if "Arduino" in p.description or "Generic" in p.description:
+            if "Arduino" in p.description or "Generic" in p.description or :
                 self.serial.port = str(p.device)    #Set serial port to the Arduino port
                 self.serial.timeout = 1             #timeout to 1 second, exits serial if no connection is made within this time
                 self.serial.setDTR(False)           #DTR = false; ensures the Arduino does not reset upon making a connection
                 self.serial.open()                  #Finally, opens the serial connection
-
+        """
         #Calls the inherited class' __init__ function to initialize UI, then
         #calls the setupUi function from it initialize more GUI things in calendar.py
         super(App, self).__init__(parent)

@@ -22,21 +22,41 @@
 #include <LiquidCrystal.h>
 #include <Servo.h>
 #include "MSPClock.h"
+#include <string.h>
+#define RIGHT 0
+#define UP 1
+#define DOWN 2
+#define LEFT 3
+#define SELECT 4
+#define NONE 5
 
 // Declare and initialize a clock object
 // Format: MSPClock VARIABLE_NAME(SEC, MIN, HOUR, DAY, MONTH, YEAR);
 MSPClock clock(0, 0, 7, 1, 1, 2016);
 
 // initialize the LCD object with the numbers of the interface pins specified in the comments above
-LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+LiquidCrystal lcd(8, 13, 9, 4, 5, 6, 7);
 
 // initialize new Servo object "s"
 Servo s;
 
 // pos holds the angular position of the servo
 // elapsedSec holds how many seconds have passed since the beginning of sunrise
-int pos = 0, elapsedSec = 0;
-int secondsPerDegree = 0;
+uint8_t pos = 0, elapsedSec = 0;
+uint8_t secondsPerDegree = 0;
+char *dayName[7] = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+int readButtons()
+{
+  int key = analogRead(0);
+
+  if (key > 1000) return NONE;
+  if (key < 50) return RIGHT;
+  if (key < 250) return UP;
+  if (key < 450) return DOWN;
+  if (key < 650) return LEFT;
+  if (key < 850) return SELECT;
+  
+}
 
 void setup() {
   // set up the LCD's number of columns and rows:
@@ -56,13 +76,15 @@ void setup() {
 
   setupTimesAndInterval();
 }
+int checkkey = 100;
 
 void loop() {
 
-  if (clock.hour == 0)
-    setupTimesAndInterval();
+  //if (clock.hour == 0)
+  //  setupTimesAndInterval();
   // Checks if the first tag byte "A" has been sent to the Arduino
-  if (Serial.read() == 'A')
+  checkkey = readButtons();
+  if (checkkey == SELECT)
   {
       // if it has, go into this function
       updateClock();
@@ -72,10 +94,10 @@ void loop() {
   updateLcd();
 
   // Increment the clock by 1 second
-  clock.tickTock();
+  //clock.tickTock();
 
   // Increment the clock by multiple seconds for debugging purposes
-  //fastTock();
+  fastTock();
 
   // Move the servo accordingly depending on the time
   updateServo();
@@ -93,7 +115,7 @@ void setupTimesAndInterval()
 // This is a function that tickTocks many times to simulate a full day in a shorter time
 void fastTock()
 {
-  int i;
+  uint8_t i;
 
   // Incrememnt 26 seconds by calling tickTock() 26 times
   // For debugging purposes only
@@ -105,47 +127,195 @@ void fastTock()
 // From a PyQt application sent with pyserial
 void updateClock()
 {
-  // The "A" tag was already found in the loop() function so we know
-  // we can parse the seconds bytes now
-  clock.sec = Serial.parseInt();
-
-
   // Until the "B" tag has been sent, wait
   // After the loop breaks and the "B"tag was sent, parse the next bytes as the minutes value
-  while (Serial.read() != 'B') 
-  { 
-  }
-  clock.min = Serial.parseInt();
+  int key;
+  int delayTime = 300;
   
-  // Same process as above, repeated...
-  while (Serial.read() != 'C')
+  key = 100;
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Seconds");
+  delay(2000);
+  
+  while (key != SELECT) 
   {
+    lcd.setCursor(0, 1);
+    key = readButtons();
+    
+    if (key == UP)
+    {
+      clock.sec++;
+      delay(delayTime);
+    }
+    if (key == DOWN)
+    {
+      clock.sec--; 
+      delay(delayTime);
+    }
+    lcd.print(clock.sec);
+    lcd.print("       ");
   }
-  clock.hour = Serial.parseInt();
 
-  while (Serial.read() != 'D')
+  key = 100;
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Minutes");
+  delay(2000);
+  
+  while (key != SELECT) 
   {
+    lcd.setCursor(0, 1);
+    key = readButtons();
+    
+    if (key == UP)
+    {
+      clock.min++;
+      delay(delayTime);
+    }
+    if (key == DOWN)
+    {
+      clock.min--; 
+      delay(delayTime);
+    }
+    lcd.print(clock.min);
+    lcd.print("       ");
   }
-  clock.day = Serial.parseInt();
 
-  while (Serial.read() != 'E')
+  key = 100;
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Hour");
+  delay(2000);
+  
+  while (key != SELECT) 
   {
+    lcd.setCursor(0, 1);
+    key = readButtons();
+    
+    if (key == UP)
+    {
+      clock.hour++;
+      delay(delayTime);
+    }
+    if (key == DOWN)
+    {
+      clock.hour--; 
+      delay(delayTime);
+    }
+    lcd.print(clock.hour);
+    lcd.print("       ");
   }
-  clock.month = Serial.parseInt();
 
-  while (Serial.read() != 'F')
+  key = 100;
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Day");
+  delay(2000);
+  
+  while (key != SELECT) 
   {
+    lcd.setCursor(0, 1);
+    key = readButtons();
+    
+    if (key == UP)
+    {
+      clock.day++;
+      delay(delayTime);
+    }
+    if (key == DOWN)
+    {
+      clock.day--; 
+      delay(delayTime);
+    }
+    lcd.print(clock.day);
+    lcd.print("       ");
   }
-  clock.year = Serial.parseInt();
 
-  while (Serial.read() != 'G')
+  key = 100;
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Month");
+  delay(2000);
+  
+  while (key != SELECT) 
   {
+    lcd.setCursor(0, 1);
+    key = readButtons();
+    
+    if (key == UP)
+    {
+      clock.month++;
+      delay(delayTime);
+    }
+    if (key == DOWN)
+    {
+      clock.month--; 
+      delay(delayTime);
+    }
+    lcd.print(clock.month);
+    lcd.print("       ");
   }
-  clock.dayOfWeek = Serial.parseInt();
+
+  key = 100;
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Year");
+  delay(2000);
+  
+  while (key != SELECT) 
+  {
+    lcd.setCursor(0, 1);
+    key = readButtons();
+    
+    if (key == UP)
+    {
+      clock.year++;
+      delay(delayTime);
+    }
+    if (key == DOWN)
+    {
+      clock.year--; 
+      delay(delayTime);
+    }
+    lcd.print(clock.year);
+    lcd.print("       ");
+  }
+
+  key = 100;
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Day of Week");
+  delay(2000);
+  
+  while (key != SELECT) 
+  {
+    lcd.setCursor(0, 1);
+    key = readButtons();
+    
+    if (key == UP)
+    {
+      clock.dayOfWeek++;
+      delay(delayTime);
+    }
+    if (key == DOWN)
+    {
+      clock.dayOfWeek--; 
+      delay(delayTime);
+    }
+    if (clock.dayOfWeek < 0)
+      clock.dayOfWeek = 6;
+    else if (clock.dayOfWeek > 6)
+      clock.dayOfWeek = 0;
+    lcd.print(dayName[clock.dayOfWeek]);
+    lcd.print("       ");
+  }
   
   clock.checkLeap();
   clock.dstDone = 0;
   setupTimesAndInterval();
+
+  updateLcd();
 }
 
 // Checks the time every second to updates the servo position
@@ -161,19 +331,19 @@ void updateServo()
     // if the servo needs to move 1 degree every 10 seconds,
     // check if 10 seconds have passed since last time
     // TODO: change to something like [(sunsetTime - sunriseTime).toSeconds() / 180 degrees]
-    if (elapsedSec % secondsPerDegree == 0)
-    {
+    //if (elapsedSec % secondsPerDegree == 0)
+    //{
       // Update pos variable and write servo to the new pos
       pos += 1;
-      s.write(pos);
-    }
+      //s.write(pos);
+    //}
   }
 
   // If not in daylight hours, have servo hold its position at 0 degrees
   else
   {
     pos = 0;
-    s.write(0);
+   // s.write(0);
   }
 }
 
@@ -205,7 +375,9 @@ void updateLcd()
   lcd.print(clock.day);
   lcd.print("-");
   lcd.print(clock.year);
-  lcd.print("      ");
+  lcd.print(" ");
+  lcd.print(dayName[clock.dayOfWeek]);
+  lcd.print("     ");
   //lcd.print("=");
   //lcd.print((int)clock.sunsetHour);
   //lcd.print(":");

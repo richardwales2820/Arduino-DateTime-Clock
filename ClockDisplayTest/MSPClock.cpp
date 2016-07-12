@@ -7,7 +7,7 @@ MSPClock::MSPClock()
 }
 
 // Overloaded constructor to include the ability to set the data variables to some values at initialization
-MSPClock::MSPClock(int inSec, int inMin, int inHour, int inDay, int inMonth, int inYear)
+MSPClock::MSPClock(unsigned int inSec, unsigned int inMin, unsigned int inHour, unsigned int inDay, unsigned int inMonth, unsigned int inYear)
 {
   // Sets local object's values to the passed in arguments
 	sec = inSec;
@@ -18,7 +18,7 @@ MSPClock::MSPClock(int inSec, int inMin, int inHour, int inDay, int inMonth, int
 	year = inYear;
   dstDone = 0;
   
-	int i;
+	unsigned int i;
 
   // Initializes the dasPerMonth array to the correct number of days according to the month
 	for (i = 0; i < 12; i++)
@@ -114,7 +114,7 @@ void MSPClock::tickTock()
 
 void MSPClock::riseAndShine()
 {
-  int daysPassed = day, i;
+  unsigned int daysPassed = day, i;
   
   for (i = 1; i < month; i++)
   {
@@ -148,7 +148,7 @@ void MSPClock::riseAndShine()
 	sunsetMinute = sunsetFraction * 60.0;
 }
 
-int MSPClock::getSecondsPerDegree()
+unsigned int MSPClock::getSecondsPerDegree()
 {
   double daylightSeconds = ((sunsetHour - sunriseHour) * 60 + (sunsetMinute - sunriseMinute)) * 60;
   int secondsPerDegree = floor(daylightSeconds / 180);
